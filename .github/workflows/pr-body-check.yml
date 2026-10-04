@@ -1,0 +1,26 @@
+name: pr-body-check
+
+on:
+  pull_request:
+    types: [opened, edited, reopened, synchronize]
+
+permissions: {}
+
+jobs:
+  pr-body:
+    if: github.event.pull_request.user.type != 'Bot'
+    runs-on: ubuntu-latest
+    steps:
+      - name: PR body follows the org template
+        env:
+          BODY: ${{ github.event.pull_request.body }}
+        run: |
+          missing=""
+          for h in "What" "Why" "Testing"; do
+            printf '%s\n' "$BODY" | grep -qiE "^##[[:space:]]+$h[[:space:]]*$" || missing="$missing ## $h"
+          done
+          if [ -n "$missing" ]; then
+            echo "::error::PR description is missing:$missing (template: https://github.com/contacto-io/.github/blob/main/PULL_REQUEST_TEMPLATE.md)"
+            exit 1
+          fi
+          echo "PR description has What, Why and Testing"
