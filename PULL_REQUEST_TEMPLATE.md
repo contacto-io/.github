@@ -1,27 +1,32 @@
+## Size
+<!-- git diff --numstat origin/main...HEAD; drop rows that are all zero -->
+| PR content | Files | Added | Removed |
+|---|---:|---:|---:|
+| Source | | | |
+| Tests | | | |
+| Config | | | |
+| CI/workflows | | | |
+| Docs | | | |
+| **Total** | | | |
+
 ## What
-<!-- One or two lines: what this PR changes. -->
+<!-- The behavior after this PR, in one or two lines: what the system now does, not which code moved. -->
+<!-- Removed: list anything deleted (routes, fields, settings). -->
 
 ## Why
-<!-- The problem or ticket. Link it. -->
+<!-- The problem or ticket (link it), with impact in numbers: who hits it, how often. -->
 
 ## How
-<!-- Only the non-obvious parts: design choices, trade-offs, what you ruled out. Skip if trivial. -->
-
-## Size
-<!-- Lines without tests, so reviewers can tell code from test bulk.
-     git diff --shortstat origin/main...HEAD -- . ':(exclude)tests' -->
-| | added | removed |
-|---|---|---|
-| code | | |
-| tests | | |
+<!-- Only the non-obvious parts: design choices, trade-offs, what you ruled out. Skip if trivial.
+     When the change touches more than one service or a request path, add a mermaid diagram (GitHub renders it):
+     a flowchart for control or data flow, a sequence diagram for calls between services, a state diagram for state changes. -->
 
 ## Testing
 <!-- What you ran and the result. Say what you did NOT test. -->
-- [ ] Unit tests:
-- [ ] Manual / dev check:
 
 ## Risk
-<!-- What could break, who is affected, how to roll back. "None" is a valid answer. -->
+<!-- What could break, who is affected. "None" is a valid answer. -->
 
-## Deploy notes
-<!-- Config, secrets, migrations, order of merges. Delete if none. -->
+**PRs:** <!-- companion PRs: <repo> dev #N · <repo> prod #N · <other-repo> #N. Delete if none. -->
+
+**Merge/deploy:** <!-- "independent", or the order and why; what each side does alone; config/secrets/migrations; rollback. -->
