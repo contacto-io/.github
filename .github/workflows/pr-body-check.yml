@@ -4,7 +4,8 @@ on:
   pull_request:
     types: [opened, edited, reopened, synchronize]
 
-permissions: {}
+permissions:
+  pull-requests: read
 
 jobs:
   pr-body:
@@ -13,14 +14,18 @@ jobs:
     steps:
       - name: PR body follows the org template
         env:
-          BODY: ${{ github.event.pull_request.body }}
+          GH_TOKEN: ${{ github.token }}
+          PR: ${{ github.event.pull_request.number }}
+          REPO: ${{ github.repository }}
+        # reads the CURRENT body, so "Re-run" passes once the description is fixed (a re-run replays the old event)
         run: |
+          body=$(gh api "repos/$REPO/pulls/$PR" --jq '.body // ""')
           missing=""
           for h in "What" "Why" "Testing"; do
-            printf '%s\n' "$BODY" | grep -qiE "^##[[:space:]]+$h[[:space:]]*$" || missing="$missing ## $h"
+            printf '%s\n' "$body" | grep -qiE "^##[[:space:]]+$h[[:space:]]*$" || missing="$missing ## $h"
           done
           if [ -n "$missing" ]; then
-            echo "::error::PR description is missing:$missing (template: https://github.com/contacto-io/.github/blob/main/PULL_REQUEST_TEMPLATE.md)"
+            echo "::error::PR description is missing:$missing. Add the sections (template: https://github.com/contacto-io/.github/blob/main/PULL_REQUEST_TEMPLATE.md), then re-run this check."
             exit 1
           fi
           echo "PR description has What, Why and Testing"
