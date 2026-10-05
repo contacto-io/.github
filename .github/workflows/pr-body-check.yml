@@ -17,6 +17,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           PR: ${{ github.event.pull_request.number }}
           REPO: ${{ github.repository }}
+          RUN: ${{ github.run_id }}
         # reads the CURRENT body, so "Re-run" passes once the description is fixed (a re-run replays the old event)
         run: |
           body=$(gh api "repos/$REPO/pulls/$PR" --jq '.body // ""')
@@ -25,7 +26,12 @@ jobs:
             printf '%s\n' "$body" | grep -qiE "^##[[:space:]]+$h[[:space:]]*$" || missing="$missing ## $h"
           done
           if [ -n "$missing" ]; then
-            echo "::error::PR description is missing:$missing. Add the sections (template: https://github.com/contacto-io/.github/blob/main/PULL_REQUEST_TEMPLATE.md), then re-run this check."
+            msg="PR description is missing:$missing. Template: https://github.com/contacto-io/.github/blob/main/PULL_REQUEST_TEMPLATE.md
+          To fix: 1) add the sections to the PR description (gh pr edit $PR -R $REPO --body-file <file>);
+          2) re-run this check, which reads the current description: gh run rerun $RUN -R $REPO --failed
+             (or the Re-run button on the check). Editing the description alone may not start a new run; pushing a commit also works."
+            echo "::error::$(printf '%s' "$msg" | tr '\n' ' ')"
+            printf '%s\n' "$msg" | tee -a "$GITHUB_STEP_SUMMARY"
             exit 1
           fi
           echo "PR description has What, Why and Testing"
