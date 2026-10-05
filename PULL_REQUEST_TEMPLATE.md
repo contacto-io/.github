@@ -17,9 +17,9 @@
 <!-- The problem or ticket (link it), with impact in numbers: who hits it, how often. -->
 
 ## How
-<!-- Only the non-obvious parts: design choices, trade-offs, what you ruled out. Skip if trivial.
-     When the change touches more than one service or a request path, add a mermaid diagram (GitHub renders it):
-     a flowchart for control or data flow, a sequence diagram for calls between services, a state diagram for state changes. -->
+<!-- Show the change visually: add mermaid diagrams (GitHub renders them), before and after where it helps.
+     A flowchart for control or data flow, a sequence diagram for calls between services, a state diagram for
+     state changes. Then the non-obvious parts in words: design choices, trade-offs, what you ruled out. -->
 
 ## Testing
 <!-- What you ran and the result. Say what you did NOT test. -->
