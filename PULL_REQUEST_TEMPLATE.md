@@ -17,9 +17,16 @@
 <!-- The problem or ticket (link it), with impact in numbers: who hits it, how often. -->
 
 ## How
-<!-- Show the change visually: add mermaid diagrams (GitHub renders them), before and after where it helps.
-     A flowchart for control or data flow, a sequence diagram for calls between services, a state diagram for
-     state changes. Then the non-obvious parts in words: design choices, trade-offs, what you ruled out. -->
+<!-- Show the change visually. Pick the smallest view that makes the point; one or two, not all:
+     - logic or an algorithm: pseudocode in a ```text block
+     - runtime control flow: a call tree (caller, then indented callees)
+     - UI structure: a component tree, with the state and module boundaries that matter
+     - a refactor or new files: a shallow file tree, one comment per directory
+     - calls between services, or data flow: a mermaid sequenceDiagram or flowchart (GitHub renders them)
+     - state changes: a mermaid stateDiagram
+     - what changed in a shape that already exists: a ```diff block of that tree or flow (+ added, - removed)
+     Keep only the calls, files and boundaries a reviewer needs. Then, in words: design choices, trade-offs,
+     what you ruled out. -->
 
 ## Testing
 <!-- What you ran and the result. Say what you did NOT test. -->
