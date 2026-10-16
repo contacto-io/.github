@@ -35,6 +35,10 @@ on:
       ecs-container-name:
         type: string
         required: true
+      # return once ECS accepts the deployment; skips the stability wait and the PRIMARY check
+      skip-stability-wait:
+        type: boolean
+        default: false
 
 permissions: {}
 
@@ -141,9 +145,10 @@ jobs:
           task-definition: ${{ steps.render.outputs.task-definition }}
           cluster: ${{ inputs.ecs-cluster }}
           service: ${{ inputs.ecs-service }}
-          wait-for-service-stability: true
+          wait-for-service-stability: ${{ !inputs.skip-stability-wait }}
           wait-max-delay-seconds: 15
-      - env:
+      - if: ${{ !inputs.skip-stability-wait }}
+        env:
           CLUSTER: ${{ inputs.ecs-cluster }}
           SERVICE: ${{ inputs.ecs-service }}
           EXPECTED: ${{ steps.deploy.outputs.task-definition-arn }}
