@@ -35,7 +35,8 @@ on:
       ecs-container-name:
         type: string
         required: true
-      # return once ECS accepts the deployment; skips the stability wait and the PRIMARY check
+      # return once ECS accepts the deployment; later rollout failure is not detected,
+      # so enable only on services with ECS deployment rollback on
       skip-stability-wait:
         type: boolean
         default: false
