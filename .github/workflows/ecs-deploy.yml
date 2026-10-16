@@ -142,6 +142,7 @@ jobs:
           cluster: ${{ inputs.ecs-cluster }}
           service: ${{ inputs.ecs-service }}
           wait-for-service-stability: true
+          wait-max-delay-seconds: 15
       - env:
           CLUSTER: ${{ inputs.ecs-cluster }}
           SERVICE: ${{ inputs.ecs-service }}
