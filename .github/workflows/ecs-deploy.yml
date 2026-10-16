@@ -15,6 +15,14 @@ on:
       context:
         type: string
         default: .
+      # the only branch that may deploy; empty means dev for dev, main for prod
+      branch:
+        type: string
+        default: ''
+      # overrides vars.AWS_REGION; call once per region (matrix) for multi-region
+      aws-region:
+        type: string
+        default: ''
 
 permissions: {}
 
@@ -29,7 +37,7 @@ jobs:
     runs-on: ${{ inputs.runs-on }}
     timeout-minutes: 60
     concurrency:
-      group: ${{ github.repository }}-${{ inputs.environment }}
+      group: ${{ github.repository }}-${{ inputs.environment }}-${{ inputs.aws-region || vars.AWS_REGION }}
       cancel-in-progress: false
     permissions:
       id-token: write
@@ -39,18 +47,21 @@ jobs:
         env:
           ENVIRONMENT: ${{ inputs.environment }}
           REF: ${{ github.ref }}
+          BRANCH: ${{ inputs.branch }}
         run: |
-          case "$ENVIRONMENT:$REF" in
-            dev:refs/heads/dev | prod:refs/heads/main) ;;
-            *) echo "::error::$ENVIRONMENT deploys only from dev (dev) or main (prod); got $REF"; exit 1 ;;
-          esac
+          case "$ENVIRONMENT" in dev) def=dev ;; prod) def=main ;; *) def= ;; esac
+          want=${BRANCH:-$def}
+          if [ -z "$want" ] || [ "$REF" != "refs/heads/$want" ]; then
+            echo "::error::$ENVIRONMENT deploys only from branch '${want:-<set the branch input>}'; got $REF"
+            exit 1
+          fi
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
       - uses: aws-actions/configure-aws-credentials@e1253824e5c10ff9df46874f81ed3ec929e19cfd # v6.3.0
         with:
           role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
-          aws-region: ${{ vars.AWS_REGION }}
+          aws-region: ${{ inputs.aws-region || vars.AWS_REGION }}
       - id: ecr
         uses: aws-actions/amazon-ecr-login@03f1aad4c6c7ffd436567f42f9384779290529bd # v2.1.7
       - id: image
