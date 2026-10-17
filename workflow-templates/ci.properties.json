@@ -1,0 +1,6 @@
+{
+  "name": "CI with central gate",
+  "description": "Runs your jobs and a single ci-passed check that fails on failure, cancellation, or a draft PR.",
+  "iconName": "octicon check-circle",
+  "categories": ["Continuous integration"]
+}
