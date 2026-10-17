@@ -1,0 +1,34 @@
+name: ci-gate
+
+on:
+  workflow_call:
+    inputs:
+      # pass ${{ toJSON(needs) }} from the calling job
+      needs-json:
+        type: string
+        required: true
+      runs-on:
+        type: string
+        default: ubuntu-latest-m-cx
+
+permissions: {}
+
+jobs:
+  gate:
+    runs-on: ${{ inputs.runs-on }}
+    steps:
+      # a skipped or green check on a draft would satisfy the required check right after Ready
+      - name: Fail on a draft PR
+        if: github.event_name == 'pull_request' && github.event.pull_request.draft
+        run: |
+          echo "::error::draft PR; mark it ready for review"
+          exit 1
+      - name: Fail if a needed job failed or was cancelled
+        env:
+          NEEDS: ${{ inputs.needs-json }}
+        run: |
+          bad=$(jq -r 'to_entries[] | select(.value.result == "failure" or .value.result == "cancelled") | "\(.key): \(.value.result)"' <<< "$NEEDS")
+          if [ -n "$bad" ]; then
+            echo "::error::$bad"
+            exit 1
+          fi
