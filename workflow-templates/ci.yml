@@ -3,7 +3,7 @@ name: ci
 on:
   pull_request:
     branches: [main]
-    types: [opened, synchronize, reopened, ready_for_review]
+    types: [opened, synchronize, reopened, ready_for_review, converted_to_draft]
   push:
     branches: [main]
 
@@ -17,10 +17,10 @@ jobs:
     if: github.event_name == 'push' || !github.event.pull_request.draft
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - run: echo "build and test here"
 
-  # add every job above to needs; pin the ref to a commit SHA
+  # add every job above to needs; pin ci-gate.yml to a commit SHA once merged
   ci-passed:
     if: always()
     needs: [example]
