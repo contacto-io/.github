@@ -40,6 +40,10 @@ on:
       skip-stability-wait:
         type: boolean
         default: false
+      # stability wait before failing; keep below the 20-minute job timeout
+      wait-for-minutes:
+        type: number
+        default: 10
 
 permissions: {}
 
@@ -52,7 +56,7 @@ jobs:
     # environment first: approval gate and env vars apply before any AWS creds
     environment: ${{ inputs.environment }}
     runs-on: ${{ inputs.runs-on }}
-    timeout-minutes: 60
+    timeout-minutes: 20
     concurrency:
       group: ${{ github.repository }}-${{ inputs.environment }}-${{ inputs.aws-region }}
       cancel-in-progress: false
@@ -147,6 +151,7 @@ jobs:
           cluster: ${{ inputs.ecs-cluster }}
           service: ${{ inputs.ecs-service }}
           wait-for-service-stability: ${{ !inputs.skip-stability-wait }}
+          wait-for-minutes: ${{ inputs.wait-for-minutes }}
           wait-max-delay-seconds: 15
       - if: ${{ !inputs.skip-stability-wait }}
         env:
