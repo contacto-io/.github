@@ -44,6 +44,11 @@ on:
       wait-for-minutes:
         type: number
         default: 10
+      # space-separated check-run names that must be green on the deployed SHA; prod only.
+      # '' opts out. callers must grant checks: read (the job requests it either way)
+      required-checks:
+        type: string
+        default: ci-passed
 
 permissions: {}
 
@@ -67,6 +72,7 @@ jobs:
     permissions:
       id-token: write
       contents: read
+      checks: read
     steps:
       - name: Branch guard
         env:
@@ -84,6 +90,24 @@ jobs:
             echo "::error::no deploy role or region set for $ENVIRONMENT"
             exit 1
           fi
+      - name: Required checks
+        if: inputs.environment == 'prod' && inputs.required-checks != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CHECKS: ${{ inputs.required-checks }}
+        run: |
+          set -f
+          bad=0
+          for check in $CHECKS; do
+            state=$(gh api -X GET "repos/$GITHUB_REPOSITORY/commits/$GITHUB_SHA/check-runs" -f check_name="$check" \
+              --jq '.check_runs[0] | if . == null then "missing" else .conclusion // .status end')
+            echo "$check: $state"
+            if [ "$state" != success ]; then
+              echo "::error::check '$check' on $GITHUB_SHA is $state; prod deploy needs it green"
+              bad=1
+            fi
+          done
+          exit "$bad"
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
