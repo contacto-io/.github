@@ -1,0 +1,29 @@
+name: ci
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened, ready_for_review, converted_to_draft]
+  push:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  # replace with your jobs; keep the if so drafts skip CI
+  example:
+    if: github.event_name == 'push' || !github.event.pull_request.draft
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - run: echo "build and test here"
+
+  # add every job above to needs
+  ci-passed:
+    if: always()
+    needs: [example]
+    uses: contacto-io/workflows/.github/workflows/ci-gate.yml@78166523d98d20e05a254642534c8146e1d51ee2
+    with:
+      needs-json: ${{ toJSON(needs) }}
