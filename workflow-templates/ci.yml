@@ -20,10 +20,10 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - run: echo "build and test here"
 
-  # add every job above to needs; pin ci-gate.yml to a commit SHA once merged
+  # add every job above to needs
   ci-passed:
     if: always()
     needs: [example]
-    uses: contacto-io/.github/.github/workflows/ci-gate.yml@main
+    uses: contacto-io/workflows/.github/workflows/ci-gate.yml@78166523d98d20e05a254642534c8146e1d51ee2
     with:
       needs-json: ${{ toJSON(needs) }}
